@@ -1,0 +1,109 @@
+<div class="view view--main">
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Media Timer</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero jumbotron">
+        <h1 class="hero__head">Media Timer</h1>
+        <h4 class="hero__message">Start typing below</h4>
+    </div>
+
+    <div class="row">
+        <div class="main-form col-md-7  col-xs-12">
+            <div class="input-group query-input">
+                <input class="form-control" placeholder="Movie or TV Show" type="text" ng-model="query">
+            </div>
+
+            <div class="query-autocomplete">
+                <div>
+                    <div class="item" ng-repeat="result in allResults" ng-if="result.poster_path">
+                        <div class="item__image-container">
+                            <img onerror="this.src=''" class="item__image" ng-src="http://image.tmdb.org/t/p/w342/{{result.poster_path}}">
+                            <div class="image__hover">
+                            <span class="image__text">
+                                {{ result.name }}
+                            </span>
+                            </div>
+                        </div>
+
+                        <button ng-hide="result.media_type === 'movie'" type="button" class="btn btn-primary" ng-click="beginAddItem(result)">Add To List</button>
+                        <button ng-show="result.media_type === 'movie'" type="button" class="btn btn-primary" ng-click="beginAddItem(result)">Add To List</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="item-cart col-md-5 col-xs-12">
+            <h3>Added Movies and Shows</h3>
+
+            <div class="cart-items">
+                <div class="item" ng-repeat="result in itemCart" ng-if="result.poster_path">
+                    <div class="item__image-container">
+                        <img onerror="this.src=''" class="item__image" ng-src="http://image.tmdb.org/t/p/w342/{{result.poster_path}}">
+                        <div class="image__hover">
+                            <span class="image__text">
+                                {{ result.name }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="seasons" ng-if="result.media_type === 'tv'">
+                        {{ seasonStringFromShow(result) }}
+                    </div>
+
+                    <br ng-if="result.media_type !== 'tv'">
+
+                    <div class="minute-total">{{ result.totalMinutes | number:0 }} Minutes</div>
+                </div>
+
+                <div class="all-sum" ng-if="itemCart.length > 0">
+                    <h1>Total Time</h1>
+
+                    <div class="time-string">
+                        {{ stringFromTimeObject(millisecondsToTimeObject(sumCart(itemCart) * 60 * 1000)) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade add-dialog" id="myModal" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-image: url(http://image.tmdb.org/t/p/w342/{{ selected.backdrop_path }});">
+                    <button type="button" class="close" ng-click="closeModal()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Add {{ selected.name }}</h4>
+                </div>
+                <div class="modal-body">
+
+                    <button class="btn btn-default all-seasons" ng-click="selectAll(selected)">Select All Seasons</button>
+
+                    <div class="seasons">
+                        <div class="season" ng-repeat="season in selected.seasons" ng-if="season.season_number > 0">
+                            <label>
+                                <input type="checkbox" ng-model="season.selected">
+                                Season {{ season.season_number }}
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="closeModal()">Close</button>
+                    <button type="button" class="btn btn-primary" ng-click="addItem(selected)">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
